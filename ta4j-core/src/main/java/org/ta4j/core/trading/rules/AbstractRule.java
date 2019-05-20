@@ -26,24 +26,47 @@ package org.ta4j.core.trading.rules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.Rule;
+import org.ta4j.core.Trade;
+import org.ta4j.core.TradingRecord;
+import org.ta4j.core.utils.StringUtils;
 
 /**
  * An abstract trading {@link Rule rule}.
  */
 public abstract class AbstractRule implements Rule {
 
-    /** The logger */
+    /**
+     * The logger
+     */
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
-    /** The class name */
+    /**
+     * The class name
+     */
     protected final String className = getClass().getSimpleName();
 
     /**
      * Traces the isSatisfied() method calls.
-     * @param index the bar index
+     *
+     * @param index       the bar index
      * @param isSatisfied true if the rule is satisfied, false otherwise
      */
     protected void traceIsSatisfied(int index, boolean isSatisfied) {
         log.trace("{}#isSatisfied({}): {}", className, index, isSatisfied);
+    }
+
+    protected void setEventType(TradingRecord tradingRecord, String eventType) {
+        if (tradingRecord == null) {
+            return;
+        }
+        
+        Trade currentTrade = tradingRecord.getCurrentTrade();
+        if (currentTrade != null) {
+            if (tradingRecord.getLastOrder() == null || tradingRecord.getLastOrder().isSell()) {
+                tradingRecord.getCurrentTrade().setEventTypeBuy(eventType);
+            } else if (tradingRecord.getLastOrder() != null && tradingRecord.getLastOrder().isBuy()) {
+                tradingRecord.getCurrentTrade().setEventTypeSell(eventType);
+            }
+        }
     }
 }

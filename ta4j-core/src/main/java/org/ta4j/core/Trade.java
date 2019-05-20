@@ -23,6 +23,8 @@
  *******************************************************************************/
 package org.ta4j.core;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.ta4j.core.Order.OrderType;
 import org.ta4j.core.num.Num;
 
@@ -52,6 +54,13 @@ public class Trade implements Serializable {
     /** The type of the entry order */
     private OrderType startingType;
 
+    @Getter
+    @Setter
+    private String eventTypeBuy;
+    @Getter
+    @Setter
+    private String eventTypeSell;
+    
     /**
      * Constructor.
      */
