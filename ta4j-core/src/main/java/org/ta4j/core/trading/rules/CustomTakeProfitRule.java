@@ -32,9 +32,14 @@ public class CustomTakeProfitRule extends org.ta4j.core.trading.rules.StopGainRu
         Num currentPrice = closePrice.getValue(index);
         Num threshold = entryPrice.multipliedBy(lossRatioThreshold);
         if (satisfied) {
+            Bar bar = series.getBar(index);
             setEventType(tradingRecord, String.format("satisfied by take profit loss " +
+                            "start time: %s " +
+                            "end time: %s " +
                             "current price: %s " +
                             "threshold: %s ",
+                    bar.getBeginTime(),
+                    bar.getEndTime(),
                     currentPrice,
                     threshold));
         }

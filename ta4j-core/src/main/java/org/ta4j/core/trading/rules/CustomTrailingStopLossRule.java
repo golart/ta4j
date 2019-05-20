@@ -1,6 +1,7 @@
 package org.ta4j.core.trading.rules;
 
 import lombok.extern.slf4j.Slf4j;
+import org.ta4j.core.Bar;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
@@ -74,11 +75,16 @@ public class CustomTrailingStopLossRule extends AbstractRule {
                 }
 
                 if (satisfied) {
+                    Bar bar = closePrice.getTimeSeries().getBar(index);
                     setEventType(tradingRecord, String.format("satisfied by trailing " +
+                                    "start time: %s " +
+                                    "end time: %s " +
                                     "current price: %s " +
                                     "buy price: %s " +
                                     "threshold: %s",
-                            currentPrice,
+                            bar.getBeginTime(),
+                            bar.getEndTime(),
+                            bar.getClosePrice(),
                             currentTrade.getEntry().getPrice(),
                             threshold));
                 }
@@ -86,12 +92,15 @@ public class CustomTrailingStopLossRule extends AbstractRule {
                 Num currentPrice = closePrice.getValue(index);
                 satisfied = isSellSatisfied(currentPrice);
                 if (satisfied) {
+                    Bar bar = closePrice.getTimeSeries().getBar(index);
                     setEventType(tradingRecord, String.format("satisfied by trailing " +
+                                    "start time: %s " +
+                                    "end time: %s " +
                                     "current price: %s " +
-                                    "buy price: %s " +
                                     "threshold: %s",
-                            currentPrice,
-                            currentTrade.getEntry().getPrice(),
+                            bar.getBeginTime(),
+                            bar.getEndTime(),
+                            bar.getClosePrice(),
                             threshold));
                 }
             }

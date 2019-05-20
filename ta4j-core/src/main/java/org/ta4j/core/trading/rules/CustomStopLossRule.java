@@ -34,9 +34,14 @@ public class CustomStopLossRule extends org.ta4j.core.trading.rules.StopLossRule
         Num currentPrice = closePrice.getValue(index);
         Num threshold = entryPrice.multipliedBy(lossRatioThreshold);
         if (satisfied) {
+            Bar bar = series.getBar(index);
             setEventType(tradingRecord, String.format("satisfied by stop loss " +
+                            "start time: %s " +
+                            "end time: %s " +
                             "current price: %s " +
                             "threshold: %s",
+                    bar.getBeginTime(),
+                    bar.getEndTime(),
                     currentPrice,
                     threshold));
         }

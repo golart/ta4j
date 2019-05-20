@@ -63,9 +63,18 @@ public abstract class AbstractRule implements Rule {
         Trade currentTrade = tradingRecord.getCurrentTrade();
         if (currentTrade != null) {
             if (tradingRecord.getLastOrder() == null || tradingRecord.getLastOrder().isSell()) {
-                tradingRecord.getCurrentTrade().setEventTypeBuy(eventType);
+                String prevEvent = "";
+                if (!StringUtils.isEmpty(tradingRecord.getCurrentTrade().getEventTypeBuy())) {
+                    prevEvent = tradingRecord.getCurrentTrade().getEventTypeBuy() + " -> ";
+                }
+                tradingRecord.getCurrentTrade().setEventTypeBuy(prevEvent + eventType);
             } else if (tradingRecord.getLastOrder() != null && tradingRecord.getLastOrder().isBuy()) {
-                tradingRecord.getCurrentTrade().setEventTypeSell(eventType);
+                String prevEvent = "";
+                if (!StringUtils.isEmpty(tradingRecord.getCurrentTrade().getEventTypeSell())) {
+                    prevEvent = tradingRecord.getCurrentTrade().getEventTypeSell() + " -> ";
+                }
+                tradingRecord.getCurrentTrade().setEventTypeSell(prevEvent + eventType);
+                
             }
         }
     }
