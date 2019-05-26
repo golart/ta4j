@@ -1,5 +1,7 @@
 package org.ta4j.core.trading.rules;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Bar;
 import org.ta4j.core.Trade;
@@ -28,10 +30,14 @@ public class CustomTrailingStopLossRule extends AbstractRule {
     /**
      * the current price extremum
      */
+    @Getter
+    @Setter
     private Num currentExtremum = null;
     /**
      * the current threshold
      */
+    @Getter
+    @Setter
     private Num threshold = null;
     private Num takeProfitThreshold = null;
     /**
@@ -54,6 +60,16 @@ public class CustomTrailingStopLossRule extends AbstractRule {
         this.takeProfitPercentage = takeProfitPercentage != null ? PrecisionNum.valueOf(takeProfitPercentage) : PrecisionNum.valueOf(0);
     }
 
+    public CustomTrailingStopLossRule withThresholdPrice(Num threshold) {
+        this.threshold = threshold;
+        return this;
+    }
+
+    public CustomTrailingStopLossRule withPrevPrice(Num currentExtremum) {
+        this.currentExtremum = currentExtremum;
+        return this;
+    }
+
     @Override
     public boolean isSatisfied(int index, TradingRecord tradingRecord) {
         boolean satisfied = false;
@@ -69,7 +85,7 @@ public class CustomTrailingStopLossRule extends AbstractRule {
                 }
                 Num currentPrice = closePrice.getValue(index);
                 if (currentTrade.getEntry().isBuy()) {
-                    satisfied = isBuySatisfied(currentPrice);
+                    satisfied = isBuySatisfied(currentPrice, currentTrade.getEntry().getPrice());
                 } else {
                     satisfied = isSellSatisfied(currentPrice);
                 }
@@ -113,15 +129,15 @@ public class CustomTrailingStopLossRule extends AbstractRule {
         log.trace("{}#isSatisfied({}): {}", className, index, isSatisfied);
     }
 
-    private boolean isBuySatisfied(Num currentPrice) {
+    private boolean isBuySatisfied(Num currentPrice, Num buyPrice) {
         boolean satisfied = false;
         if (currentExtremum == null) {
             currentExtremum = currentPrice.numOf(Float.MIN_VALUE);
         }
         if (takeProfitThreshold == null) {
-            takeProfitThreshold = currentPrice.multipliedBy(currentPrice.numOf(100).minus(takeProfitPercentage).dividedBy(currentPrice.numOf(100)));
+            takeProfitThreshold = CustomTakeProfitRule.calculateProfitThresholdPrice(buyPrice, takeProfitPercentage);
         }
-        if (currentPrice.isGreaterThan(currentExtremum) && currentPrice.isGreaterThanOrEqual(takeProfitPercentage)) {
+        if (currentPrice.isGreaterThan(currentExtremum) && currentPrice.isGreaterThanOrEqual(takeProfitThreshold)) {
             currentExtremum = currentPrice;
             Num lossRatioThreshold = currentPrice.numOf(100).minus(lossPercentage).dividedBy(currentPrice.numOf(100));
             threshold = currentExtremum.multipliedBy(lossRatioThreshold);
@@ -130,6 +146,26 @@ public class CustomTrailingStopLossRule extends AbstractRule {
             satisfied = currentPrice.isLessThanOrEqual(threshold);
         }
         return satisfied;
+    }
+    
+    public static Num calculateSellThresholdPrice(Num currentPrice, Num buyPrice, Num lossPercentage, Num takeProfitPercentage) {
+        
+        if (takeProfitPercentage != null && !takeProfitPercentage.isEqual(PrecisionNum.valueOf(0))) {            
+            Num takeProfitPrice = CustomTakeProfitRule.calculateProfitThresholdPrice(buyPrice, takeProfitPercentage);
+            
+            if (currentPrice.isGreaterThanOrEqual(takeProfitPrice)) {
+                Num lossRatioThreshold = currentPrice.numOf(100).minus(lossPercentage).dividedBy(currentPrice.numOf(100));
+                return currentPrice.multipliedBy(lossRatioThreshold);
+            }
+            return null;
+        }
+        Num lossRatioThreshold = currentPrice.numOf(100).minus(lossPercentage).dividedBy(currentPrice.numOf(100));
+        return currentPrice.multipliedBy(lossRatioThreshold);
+    }
+    
+    public static Num calculateBuyThresholdPrice(Num currentPrice, Num lossPercentage) {
+        Num lossRatioThreshold = currentPrice.numOf(100).plus(lossPercentage).dividedBy(currentPrice.numOf(100));
+        return currentPrice.multipliedBy(lossRatioThreshold);
     }
 
     private boolean isSellSatisfied(Num currentPrice) {

@@ -43,6 +43,10 @@ public interface Bar extends Serializable {
      * @return the open price of the period
      */
     Num getOpenPrice();
+    /**
+     * the open price of the period
+     */
+    void setOpenPrice(Num openPrice);
 
     /**
      * @return the min price of the period
@@ -50,9 +54,19 @@ public interface Bar extends Serializable {
     Num getMinPrice();
 
     /**
+     * the min price of the period
+     */
+    void setMinPrice(Num minPrice);
+
+    /**
      * @return the max price of the period
      */
     Num getMaxPrice();
+
+    /**
+     * the max price of the period
+     */
+    void setMaxPrice(Num maxPrice);
 
     /**
      * @return the close price of the period
@@ -60,9 +74,19 @@ public interface Bar extends Serializable {
     Num getClosePrice();
 
     /**
+     * @return the close price of the period
+     */
+    void setClosePrice(Num price);
+
+    /**
      * @return the whole tradeNum volume in the period
      */
     Num getVolume();
+
+    /**
+     * the whole tradeNum volume in the period
+     */
+    void setVolume(Num num);
 
     /**
      * @return the number of trades in the period

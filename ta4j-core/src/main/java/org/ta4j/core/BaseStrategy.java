@@ -23,6 +23,7 @@
  *******************************************************************************/
 package org.ta4j.core;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,9 @@ public class BaseStrategy implements Strategy {
 
     /** Name of the strategy */
     private String name;
+    
+    @Getter
+    private TimeSeries timeSeries;
 
     /** The entry rule */
     private Rule entryRule;
@@ -61,6 +65,11 @@ public class BaseStrategy implements Strategy {
      */
     public BaseStrategy(Rule entryRule, Rule exitRule) {
         this(null, entryRule, exitRule, 0);
+    }
+    
+    public BaseStrategy(Rule entryRule, Rule exitRule, TimeSeries timeSeries) {
+        this(null, entryRule, exitRule, 0);
+        this.timeSeries = timeSeries;
     }
 
      /**

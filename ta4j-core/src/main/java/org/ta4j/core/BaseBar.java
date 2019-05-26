@@ -174,6 +174,11 @@ public class BaseBar implements Bar {
         return closePrice;
     }
 
+    @Override
+    public void setClosePrice(Num price) {
+        this.closePrice = price;
+    }
+
     /**
      * @return the whole traded volume in the period
      */
@@ -214,6 +219,42 @@ public class BaseBar implements Bar {
      */
     public ZonedDateTime getEndTime() {
         return endTime;
+    }
+
+    public void setTimePeriod(Duration timePeriod) {
+        this.timePeriod = timePeriod;
+    }
+
+    public void setEndTime(ZonedDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setBeginTime(ZonedDateTime beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public void setOpenPrice(Num openPrice) {
+        this.openPrice = openPrice;
+    }
+
+    public void setMaxPrice(Num maxPrice) {
+        this.maxPrice = maxPrice;
+    }
+
+    public void setMinPrice(Num minPrice) {
+        this.minPrice = minPrice;
+    }
+
+    public void setAmount(Num amount) {
+        this.amount = amount;
+    }
+
+    public void setVolume(Num volume) {
+        this.volume = volume;
+    }
+
+    public void setTrades(int trades) {
+        this.trades = trades;
     }
 
     /**

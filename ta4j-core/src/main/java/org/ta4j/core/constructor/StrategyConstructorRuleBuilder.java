@@ -244,7 +244,7 @@ public abstract class StrategyConstructorRuleBuilder {
      */
     private StrategyPropertyWrapper upgradeTradeProperties(StrategyPropertyWrapper strategyProperties) {
         if (CollectionUtils.isEmpty(lossOrTrailingIndicatorWrappers)) {
-            return this.strategyProperties;
+            return strategyProperties;
         }
 
         for (StopLossOrTrailingIndicatorWrapper wrapper : lossOrTrailingIndicatorWrappers) {
@@ -253,17 +253,17 @@ public abstract class StrategyConstructorRuleBuilder {
 //                    strategyProperties.setStopLoss(Integer.valueOf(wrapper.getIndicatorLogicalValue()));
                     break;
                 case TAKE_PROFIT:
-                    this.strategyProperties.setTakeProfit(new BigDecimal(wrapper.getIndicatorLogicalValue()));
+                    strategyProperties.setTakeProfit(new BigDecimal(wrapper.getIndicatorLogicalValue()));
                     break;
                 case TRAILING_BUY:
-                    this.strategyProperties.setTrailingBuy(new BigDecimal(wrapper.getIndicatorLogicalValue()));
+                    strategyProperties.setTrailingBuy(new BigDecimal(wrapper.getIndicatorLogicalValue()));
                     break;
                 case TRAILING_SELL:
-                    this.strategyProperties.setTrailingSell(new BigDecimal(wrapper.getIndicatorLogicalValue()));
+                    strategyProperties.setTrailingSell(new BigDecimal(wrapper.getIndicatorLogicalValue()));
                     break;
             }
         }
-        return this.strategyProperties;
+        return strategyProperties;
     }
 
     /**

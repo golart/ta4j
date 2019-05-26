@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  */
 @Data
 public class StrategyPropertyWrapper implements PeriodTradeProperties {
-    
+
     private String ruleToBuy;
 
     private String ruleToSell;
@@ -24,6 +24,13 @@ public class StrategyPropertyWrapper implements PeriodTradeProperties {
 
     private BigDecimal trailingSell;
 
+    private BigDecimal trailingSellPrice;
+
     private BigDecimal trailingBuy;
+
+    private BigDecimal trailingBuyPrice;
+
+    private BigDecimal prevPrice;
+
 
 }

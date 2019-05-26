@@ -137,6 +137,10 @@ public interface TimeSeries extends Serializable {
      * @return the number of removed bars
      */
     int getRemovedBarsCount();
+    /**
+     * @return the number of removed bars
+     */
+    void setRemovedBarsCount(int removeBars);
 
     /**
      * Adds a bar at the end of the series.

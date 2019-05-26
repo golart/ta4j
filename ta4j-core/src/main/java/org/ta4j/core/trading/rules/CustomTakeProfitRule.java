@@ -45,4 +45,9 @@ public class CustomTakeProfitRule extends org.ta4j.core.trading.rules.StopGainRu
         }
         return satisfied;
     }
+
+    public static Num calculateProfitThresholdPrice(Num price, Num takeProfitPercentage) {
+        return price.multipliedBy(price.numOf(100).minus(takeProfitPercentage).dividedBy(price.numOf(100)));
+    }
+
 }

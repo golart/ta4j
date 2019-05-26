@@ -92,7 +92,7 @@ public class TimeSeriesManager {
      * @return the trading record coming from the run
      */
     public TradingRecord run(Strategy strategy, int startIndex, int finishIndex) {
-        return run(strategy, OrderType.BUY, NaN, startIndex, finishIndex);
+        return run(strategy, OrderType.BUY, NaN, startIndex, finishIndex, false);
     }
 
     /**
@@ -118,7 +118,7 @@ public class TimeSeriesManager {
      * @return the trading record coming from the run
      */
     public TradingRecord run(Strategy strategy, OrderType orderType, int startIndex, int finishIndex) {
-        return run(strategy, orderType, NaN, startIndex, finishIndex);
+        return run(strategy, orderType, NaN, startIndex, finishIndex, false);
     }
 
     /**
@@ -130,7 +130,19 @@ public class TimeSeriesManager {
      * @return the trading record coming from the run
      */
     public TradingRecord run(Strategy strategy, OrderType orderType, Num amount) {
-        return run(strategy, orderType, amount, timeSeries.getBeginIndex(), timeSeries.getEndIndex());
+        return run(strategy, orderType, amount, timeSeries.getBeginIndex(), timeSeries.getEndIndex(), false);
+    }
+
+    /**
+     * Runs the provided strategy over the managed series.
+     * <p>
+     * @param strategy the trading strategy
+     * @param orderType the {@link OrderType} used to open the trades
+     * @param amount the amount used to open/close the trades
+     * @return the trading record coming from the run
+     */
+    public TradingRecord runWithCounterCurrencyAmount(Strategy strategy, OrderType orderType, Num amount ) {
+        return run(strategy, orderType, amount, timeSeries.getBeginIndex(), timeSeries.getEndIndex(), true);
     }
 
     /**
@@ -143,17 +155,23 @@ public class TimeSeriesManager {
      * @param finishIndex the finish index for the run (included)
      * @return the trading record coming from the run
      */
-    public TradingRecord run(Strategy strategy, OrderType orderType, Num amount, int startIndex, int finishIndex) {
+    public TradingRecord run(Strategy strategy, OrderType orderType, Num amount, int startIndex, int finishIndex, boolean counterCurrency) {
 
         int runBeginIndex = Math.max(startIndex, timeSeries.getBeginIndex());
         int runEndIndex = Math.min(finishIndex, timeSeries.getEndIndex());
 
         log.trace("Running strategy (indexes: {} -> {}): {} (starting with {})", runBeginIndex, runEndIndex, strategy, orderType);
         TradingRecord tradingRecord = new BaseTradingRecord(orderType);
+        Num tradeAmount = amount;
         for (int i = runBeginIndex; i <= runEndIndex; i++) {
             // For each bar between both indexes...
             if (strategy.shouldOperate(i, tradingRecord)) {
-                tradingRecord.operate(i, timeSeries.getBar(i).getClosePrice(), amount);
+                Num closePrice = timeSeries.getBar(i).getClosePrice();
+                Trade trade = tradingRecord.getCurrentTrade();
+                if (trade.isNew() && counterCurrency && amount != null && !amount.isNaN()) {
+                    tradeAmount = closePrice.dividedBy(amount);
+                }
+                tradingRecord.operate(i, closePrice, tradeAmount);
             }
         }
 

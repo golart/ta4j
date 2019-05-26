@@ -43,7 +43,8 @@ public class StrategyConstructorImpl implements IStrategyConstructor {
         this.strategyProperty = strategyProperty;
         return new BaseStrategy(
                 createRuleToBuy(ruleToBuyExpression, series),
-                createRuleToSell(ruleToSellExpression, series));
+                createRuleToSell(ruleToSellExpression, series),
+                series);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class CustomUnderOverIndicatorRule extends UnderIndicatorRule {
         final boolean satisfied = expressionSymbol.getExpressionOperation().test(first.getValue(index), second.getValue(index));
 
         if (satisfied) {
-            setEventType(tradingRecord, "satisfied by under over indicator " + indicatorName);
+            setEventType(tradingRecord, "satisfied by under over indicator " + indicatorName + ". Value: " + first.getValue(index).intValue());
         }
         traceIsSatisfied(index, satisfied);
         return satisfied;
