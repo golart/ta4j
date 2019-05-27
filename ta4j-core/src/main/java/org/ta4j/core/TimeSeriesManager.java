@@ -169,7 +169,7 @@ public class TimeSeriesManager {
                 Num closePrice = timeSeries.getBar(i).getClosePrice();
                 Trade trade = tradingRecord.getCurrentTrade();
                 if (trade.isNew() && counterCurrency && amount != null && !amount.isNaN()) {
-                    tradeAmount = closePrice.dividedBy(amount);
+                    tradeAmount = amount.dividedBy(closePrice);
                 }
                 tradingRecord.operate(i, closePrice, tradeAmount);
             }
