@@ -40,6 +40,7 @@ public class CustomTrailingStopLossRule extends AbstractRule {
     @Setter
     private Num threshold = null;
     private Num takeProfitThreshold = null;
+    private boolean takeProfitThresholdisSatisfied = false;
     /**
      * the current trade
      */
@@ -82,6 +83,7 @@ public class CustomTrailingStopLossRule extends AbstractRule {
                     currentExtremum = null;
                     takeProfitThreshold = null;
                     threshold = null;
+                    takeProfitThresholdisSatisfied = false;
                 }
                 Num currentPrice = closePrice.getValue(index);
                 if (currentTrade.getEntry().isBuy()) {
@@ -134,10 +136,13 @@ public class CustomTrailingStopLossRule extends AbstractRule {
         if (currentExtremum == null) {
             currentExtremum = currentPrice.numOf(Float.MIN_VALUE);
         }
-        if (takeProfitThreshold == null) {
+        if (takeProfitThreshold == null && takeProfitPercentage != null && !takeProfitPercentage.isNaN()) {
             takeProfitThreshold = CustomTakeProfitRule.calculateProfitThresholdPrice(buyPrice, takeProfitPercentage);
         }
-        if (currentPrice.isGreaterThan(currentExtremum) && currentPrice.isGreaterThanOrEqual(takeProfitThreshold)) {
+        if (takeProfitThreshold != null) {
+            takeProfitThresholdisSatisfied = currentPrice.isGreaterThanOrEqual(takeProfitThreshold);
+        }
+        if (currentPrice.isGreaterThan(currentExtremum) && takeProfitThreshold != null && takeProfitThresholdisSatisfied) {
             currentExtremum = currentPrice;
             Num lossRatioThreshold = currentPrice.numOf(100).minus(lossPercentage).dividedBy(currentPrice.numOf(100));
             threshold = currentExtremum.multipliedBy(lossRatioThreshold);
@@ -147,12 +152,12 @@ public class CustomTrailingStopLossRule extends AbstractRule {
         }
         return satisfied;
     }
-    
+
     public static Num calculateSellThresholdPrice(Num currentPrice, Num buyPrice, Num lossPercentage, Num takeProfitPercentage) {
-        
-        if (takeProfitPercentage != null && !takeProfitPercentage.isEqual(PrecisionNum.valueOf(0))) {            
+
+        if (takeProfitPercentage != null && !takeProfitPercentage.isEqual(PrecisionNum.valueOf(0))) {
             Num takeProfitPrice = CustomTakeProfitRule.calculateProfitThresholdPrice(buyPrice, takeProfitPercentage);
-            
+
             if (currentPrice.isGreaterThanOrEqual(takeProfitPrice)) {
                 Num lossRatioThreshold = currentPrice.numOf(100).minus(lossPercentage).dividedBy(currentPrice.numOf(100));
                 return currentPrice.multipliedBy(lossRatioThreshold);
@@ -162,7 +167,7 @@ public class CustomTrailingStopLossRule extends AbstractRule {
         Num lossRatioThreshold = currentPrice.numOf(100).minus(lossPercentage).dividedBy(currentPrice.numOf(100));
         return currentPrice.multipliedBy(lossRatioThreshold);
     }
-    
+
     public static Num calculateBuyThresholdPrice(Num currentPrice, Num lossPercentage) {
         Num lossRatioThreshold = currentPrice.numOf(100).plus(lossPercentage).dividedBy(currentPrice.numOf(100));
         return currentPrice.multipliedBy(lossRatioThreshold);

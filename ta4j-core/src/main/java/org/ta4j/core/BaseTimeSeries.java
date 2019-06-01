@@ -151,7 +151,7 @@ public class BaseTimeSeries implements TimeSeries {
      * @param seriesEndIndex   the end index (inclusive) of the time series
      * @param constrained      true to constrain the time series (i.e. indexes cannot change), false otherwise
      */
-    private BaseTimeSeries(String name, List<Bar> bars, int seriesBeginIndex, int seriesEndIndex, boolean constrained) {
+    public BaseTimeSeries(String name, List<Bar> bars, int seriesBeginIndex, int seriesEndIndex, boolean constrained) {
         this(name, bars, seriesBeginIndex, seriesEndIndex, constrained, PrecisionNum::valueOf);
     }
 

@@ -7,7 +7,7 @@
         <version>0.12</version>
     </parent>
     <artifactId>ta4j-core-custom</artifactId>
-    <version>0.12.24</version>
+    <version>0.12.26</version>
 
     <name>Ta4j Core</name>
     <description>ta4j is a Java library providing a simple API for technical analysis.</description>

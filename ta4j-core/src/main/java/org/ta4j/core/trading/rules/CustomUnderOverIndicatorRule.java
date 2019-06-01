@@ -1,5 +1,6 @@
 package org.ta4j.core.trading.rules;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.data.ExpressionSymbol;
@@ -36,7 +37,10 @@ public class CustomUnderOverIndicatorRule extends UnderIndicatorRule {
         final boolean satisfied = expressionSymbol.getExpressionOperation().test(first.getValue(index), second.getValue(index));
 
         if (satisfied) {
-            setEventType(tradingRecord, "satisfied by under over indicator " + indicatorName + ". Value: " + first.getValue(index).intValue());
+            Bar bar = first.getTimeSeries().getBar(index);
+            setEventType(tradingRecord, "satisfied by under over indicator " + indicatorName + ". Value: " +
+                    first.getValue(index).intValue() +
+                    (bar != null ? " start time: " + bar.getBeginTime() + "end time: " + bar.getEndTime() :""));
         }
         traceIsSatisfied(index, satisfied);
         return satisfied;

@@ -1,5 +1,6 @@
 package org.ta4j.core.trading.rules;
 
+import org.ta4j.core.Bar;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.data.ExpressionSymbol;
@@ -32,7 +33,9 @@ public class CustomCrossedDownIndicatorRule extends AbstractRule {
         final boolean satisfied = cross.getValue(index);
 
         if (satisfied) {
-            setEventType(tradingRecord, "satisfied by crossed down indicator " + indicatorName);
+            Bar bar = cross.getTimeSeries().getBar(index);
+            setEventType(tradingRecord, "satisfied by crossed down indicator " + indicatorName +
+                    (bar != null ? " start time: " + bar.getBeginTime() + "end time: " + bar.getEndTime() :""));
         }
 
         traceIsSatisfied(index, satisfied);
