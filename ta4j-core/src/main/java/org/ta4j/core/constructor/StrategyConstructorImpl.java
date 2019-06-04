@@ -9,6 +9,7 @@ import org.ta4j.core.TimeSeries;
 import org.ta4j.core.data.strategy.StrategyExpressionParserWrapper;
 import org.ta4j.core.data.strategy.StrategyPropertyWrapper;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.indicators.withRule.IndicatorResolverImpl;
 import org.ta4j.core.num.PrecisionNum;
 import org.ta4j.core.trading.rules.CustomStopLossRule;
 
@@ -30,8 +31,8 @@ public class StrategyConstructorImpl implements IStrategyConstructor {
     @Getter
     private StrategyPropertyWrapper strategyProperty;
 
-    public StrategyConstructorImpl(IIndicatorResolver indicatorResolver) {
-        this.indicatorResolver = indicatorResolver;
+    public StrategyConstructorImpl() {
+        this.indicatorResolver = new IndicatorResolverImpl();
         this.expressionParser = new StrategyConstructorExpressionParser();
     }
 

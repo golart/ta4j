@@ -10,6 +10,8 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.PrecisionNum;
 import org.ta4j.core.trading.rules.CustomTrailingStopLossRule;
 
+import java.util.List;
+
 /**
  * @author VKozlov
  */
@@ -30,9 +32,10 @@ public class StrategyConstructorEntryRuleBuilder extends StrategyConstructorRule
      * @return получить правило покупки индикатора
      */
     @Override
-    protected Rule getIndicatorRule(Indicator indicator, String indicatorLogicalValue, ExpressionSymbol expressionSymbol) {
+    protected Rule getIndicatorRule(Indicator indicator, String indicatorLogicalValue, List<String> params, ExpressionSymbol expressionSymbol) {
         IndicatorRequestWrapper requestWrapper = IndicatorRequestWrapper.builder()
                 .timeSeries(series)
+                .params(params)
                 .buyValue(indicatorLogicalValue)
                 .expressionSymbolToBuyRule(expressionSymbol)
                 .build();

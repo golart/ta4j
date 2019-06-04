@@ -2,6 +2,7 @@ package org.ta4j.core.constructor;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.ta4j.core.Rule;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.data.ExpressionSymbol;
@@ -10,12 +11,10 @@ import org.ta4j.core.data.strategy.StrategyExpressionParserWrapper;
 import org.ta4j.core.data.strategy.StrategyPropertyWrapper;
 import org.ta4j.core.trading.rules.ChainRule;
 import org.ta4j.core.utils.CollectionUtils;
+import org.ta4j.core.utils.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author VKozlov
@@ -23,10 +22,13 @@ import java.util.List;
  */
 public abstract class StrategyConstructorRuleBuilder {
 
+    private final String LEFT_PARAM_BRACKET = "[";
+    private final String RIGHT_PARAM_BRACKET = "]";
+
     protected final IIndicatorResolver indicatorResolver;
     protected final TimeSeries series;
-    protected final StrategyPropertyWrapper strategyProperties;
-    protected final List<StopLossOrTrailingIndicatorWrapper> lossOrTrailingIndicatorWrappers = new ArrayList<>(4);
+    private final StrategyPropertyWrapper strategyProperties;
+    private final List<StopLossOrTrailingIndicatorWrapper> lossOrTrailingIndicatorWrappers = new ArrayList<>(4);
     private Rule baseRule = null;
 
     public StrategyConstructorRuleBuilder(
@@ -113,6 +115,7 @@ public abstract class StrategyConstructorRuleBuilder {
      */
     private void parseLeftPartOfExpression(final StrategyExpressionParserWrapper wrapper) {
         String expression = wrapper.getExpression();
+
         Rule indicatorRule = createIndicatorRule(expression);
         indicatorRule = upgradeRule(indicatorRule, wrapper);
         if (this.baseRule == null) {
@@ -127,13 +130,15 @@ public abstract class StrategyConstructorRuleBuilder {
      * @param expression выражение
      * @return правило индикатора
      */
-    private Rule createIndicatorRule(final String expression) {
+    private Rule createIndicatorRule(String expression) {
         String indicatorName;
         String indicatorLogicalValue = "";
+        Pair<String, List<String>> pairExpression = parseExpressionParams(expression);
+        expression = pairExpression.getKey();
+
         ExpressionSymbol splitSymbol = ExpressionSymbol.findLogicalSymbol(expression);
 
         if (splitSymbol == null) {
-//            throw new BotException(String.format(PARSE_STRATEGY_EXCPRESSION_ERROR, expression));
             indicatorName = expression;
         } else {
             indicatorName = expression.substring(0, expression.indexOf(splitSymbol.getSymbol()));
@@ -160,7 +165,7 @@ public abstract class StrategyConstructorRuleBuilder {
                             .build());
             return null;
         }
-        return getIndicatorRule(indicator, indicatorLogicalValue, splitSymbol);
+        return getIndicatorRule(indicator, indicatorLogicalValue, pairExpression.getRight(), splitSymbol);
     }
 
     /**
@@ -267,6 +272,37 @@ public abstract class StrategyConstructorRuleBuilder {
     }
 
     /**
+     * Парсинг параметров выражений
+     *
+     * @param expression выражение
+     * @return список параметров
+     */
+    private Pair<String, List<String>> parseExpressionParams(final String expression) {
+
+        if (StringUtils.isEmpty(expression)) {
+            return Pair.of(expression, Collections.emptyList());
+        }
+        if (expression.contains(LEFT_PARAM_BRACKET) || expression.contains(RIGHT_PARAM_BRACKET)) {
+
+            //Пропущенна левая скобка в выражении
+            if (expression.contains(LEFT_PARAM_BRACKET) && !expression.contains(RIGHT_PARAM_BRACKET)) {
+                throw new IllegalArgumentException("Miss right param");
+            }
+            //Пропущенна левая скобка в выражении
+            if (expression.contains(RIGHT_PARAM_BRACKET) && !expression.contains(LEFT_PARAM_BRACKET)) {
+                throw new IllegalArgumentException("Miss left param");
+            }
+            String expressionParam = expression.substring(expression.indexOf(LEFT_PARAM_BRACKET) + 1, expression.indexOf(RIGHT_PARAM_BRACKET));
+            String[] params = expressionParam.split(",");
+            String expressionWithoutParam = expression.replace(LEFT_PARAM_BRACKET + expressionParam + RIGHT_PARAM_BRACKET, "");
+
+            return Pair.of(expressionWithoutParam, Arrays.asList(params));
+        }
+
+        return Pair.of(expression, Collections.emptyList());
+    }
+
+    /**
      * Сущеость для хранения имени и значения индикаторов трейлинга и стоплосса указанные в правиле
      */
     @Builder
@@ -276,7 +312,7 @@ public abstract class StrategyConstructorRuleBuilder {
         private String indicatorLogicalValue;
     }
 
-    protected abstract Rule getIndicatorRule(Indicator indicator, String indicatorLogicalValue, ExpressionSymbol splitSymbol);
+    protected abstract Rule getIndicatorRule(Indicator indicator, String indicatorLogicalValue, List<String> params, ExpressionSymbol splitSymbol);
 
     protected abstract Rule createByTradePropertiesRule(Rule baseRule, StrategyPropertyWrapper strategyProperties);
 }

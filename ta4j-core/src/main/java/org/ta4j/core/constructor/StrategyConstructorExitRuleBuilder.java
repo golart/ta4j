@@ -12,6 +12,8 @@ import org.ta4j.core.trading.rules.CustomTakeProfitRule;
 import org.ta4j.core.trading.rules.CustomTrailingStopLossRule;
 import org.ta4j.core.trading.rules.OrRule;
 
+import java.util.List;
+
 /**
  * @author VKozlov
  */
@@ -34,10 +36,12 @@ public class StrategyConstructorExitRuleBuilder extends StrategyConstructorRuleB
     protected Rule getIndicatorRule(
             Indicator indicator,
             String indicatorLogicalValue,
+            List<String> params,
             ExpressionSymbol expressionSymbol) {
 
         IndicatorRequestWrapper requestWrapper = IndicatorRequestWrapper.builder()
                 .timeSeries(series)
+                .params(params)
                 .sellValue(indicatorLogicalValue)
                 .expressionSymbolToSellRule(expressionSymbol)
                 .build();
@@ -50,10 +54,6 @@ public class StrategyConstructorExitRuleBuilder extends StrategyConstructorRuleB
     protected Rule createByTradePropertiesRule(Rule baseRule, StrategyPropertyWrapper strategyProperties) {
         Rule sellRule = null;
         if (strategyProperties.getTrailingSell() == null) {
-//            if (strategyProperties.getStopLoss() != null) {
-//                sellRule = new CustomStopLossRule(new ClosePriceIndicator(series), PrecisionNum.valueOf(strategyProperties.getStopLoss()), series);
-//            }
-
             if (strategyProperties.getTakeProfit() != null) {
                 if (sellRule != null) {
                     sellRule = new OrRule(sellRule, new CustomTakeProfitRule(new ClosePriceIndicator(series), PrecisionNum.valueOf(strategyProperties.getTakeProfit()), series));

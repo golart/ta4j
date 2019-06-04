@@ -18,8 +18,8 @@ import java.util.stream.Stream;
  */
 public class StrategyConstructorExpressionParser {
 
-    private final String LEFT_BRACKET = "(";
-    private final String RIGHT_BRACKET = ")";
+    private final String LEFT_EXPRESSION_BRACKET = "(";
+    private final String RIGHT_EXPRESSION_BRACKET = ")";
 
     public List<HashMap<Integer, List<StrategyExpressionParserWrapper>>> parseExpression(String expression) {
 
@@ -68,12 +68,12 @@ public class StrategyConstructorExpressionParser {
             return;
         }
 
-        String[] expressionParts = expression.split("\\" + LEFT_BRACKET);
+        String[] expressionParts = expression.split("\\" + LEFT_EXPRESSION_BRACKET);
 
         for (String expressionPart : expressionParts) {
             if (!StringUtils.isEmpty(expressionPart)) {
                 level = level + 1;
-                String[] expressionRightsParts = expressionPart.split("\\" + RIGHT_BRACKET);
+                String[] expressionRightsParts = expressionPart.split("\\" + RIGHT_EXPRESSION_BRACKET);
                 for (String expressionRightPart : expressionRightsParts) {
 
                     ExpressionSymbol expressionSymbol = null;

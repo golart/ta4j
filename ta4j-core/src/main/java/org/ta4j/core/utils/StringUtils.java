@@ -11,4 +11,8 @@ public abstract class StringUtils {
     public static boolean isEmpty(Object str) {
         return str == null || "".equals(str);
     }
+
+    private static int toInt(String value) {
+        return Integer.valueOf(value);
+    }
 }
