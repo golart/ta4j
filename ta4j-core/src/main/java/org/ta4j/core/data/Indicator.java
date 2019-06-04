@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public enum Indicator {
 
+    CCI,
     RSI,
     MACD,
     STOCH,
