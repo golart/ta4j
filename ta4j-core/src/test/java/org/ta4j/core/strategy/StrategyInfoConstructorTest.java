@@ -201,18 +201,26 @@ public class StrategyInfoConstructorTest {
         String testBuyRuleExpression19 = "STOCH[19, 4] < 30 && MACD == true";
         String testSellRuleExpression19 = "STOCH[15, 7] > 70 && MACD == true";
         Strategy strategy19 = strategyConstructor.createStrategyByExpression(
-                testBuyRuleExpression18,
-                testSellRuleExpression18,
+                testBuyRuleExpression19,
+                testSellRuleExpression19,
                 timeSeries, new StrategyPropertyWrapper());
         Rule testBuyRule19 = strategy19.getEntryRule();
         Rule testSellRule19 = strategy19.getExitRule();
-        
-        
+
+        String testBuyRuleExpression21 = "CCI[20] < 20";
+        String testSellRuleExpression21 = "CCI[20] > 70";
+        Strategy strategy21 = strategyConstructor.createStrategyByExpression(
+                testBuyRuleExpression21,
+                testSellRuleExpression21,
+                timeSeries, new StrategyPropertyWrapper());
+        Rule testBuyRule21 = strategy21.getEntryRule();
+        Rule testSellRule21 = strategy21.getExitRule();
+
         String testBuyRuleExpression20 = "RSI[14] < 30 && MACD == true -> TRAILING_BUY == 2";
         String testSellRuleExpression20 = "STOCH[14] > 70 && MACD == true -> TRAILING_SELL == 2";
         Strategy strategy20 = strategyConstructor.createStrategyByExpression(
-                testBuyRuleExpression18,
-                testSellRuleExpression18,
+                testBuyRuleExpression20,
+                testSellRuleExpression20,
                 timeSeries, new StrategyPropertyWrapper());
         Rule testBuyRule20 = strategy20.getEntryRule();
         Rule testSellRule20 = strategy20.getExitRule();
