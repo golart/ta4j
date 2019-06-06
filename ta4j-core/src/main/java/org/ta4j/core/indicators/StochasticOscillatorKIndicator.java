@@ -23,6 +23,7 @@
  *******************************************************************************/
 package org.ta4j.core.indicators;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.TimeSeries;
 import org.ta4j.core.indicators.helpers.*;
@@ -37,6 +38,7 @@ import org.ta4j.core.num.Num;
  * MinPriceIndicator and returns StochasticOsiclatorK over this indicator.
  * 
  */
+@Slf4j
 public class StochasticOscillatorKIndicator extends CachedIndicator<Num> {
     private final Indicator<Num> indicator;
 
@@ -68,9 +70,11 @@ public class StochasticOscillatorKIndicator extends CachedIndicator<Num> {
         Num highestHighPrice = highestHigh.getValue(index);
         Num lowestLowPrice = lowestMin.getValue(index);
 
-        return indicator.getValue(index).minus(lowestLowPrice)
+        Num value = indicator.getValue(index).minus(lowestLowPrice)
                 .dividedBy(highestHighPrice.minus(lowestLowPrice))
                 .multipliedBy(numOf(100));
+        log.info("StochasticOscillatorKIndicator indicator value: {} index {}", value, index);
+        return value;
     }
 
     @Override

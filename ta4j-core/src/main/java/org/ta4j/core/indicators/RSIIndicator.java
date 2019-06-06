@@ -23,6 +23,7 @@
  *******************************************************************************/
 package org.ta4j.core.indicators;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.indicators.helpers.GainIndicator;
 import org.ta4j.core.indicators.helpers.LossIndicator;
@@ -33,6 +34,7 @@ import org.ta4j.core.num.Num;
  * <p>
  * Computed using original Welles Wilder formula.
  */
+@Slf4j
 public class RSIIndicator extends CachedIndicator<Num> {
 
     private final MMAIndicator averageGainIndicator;
@@ -58,6 +60,8 @@ public class RSIIndicator extends CachedIndicator<Num> {
         }
         Num relativeStrength = averageGain.dividedBy(averageLoss);
         // compute relative strength index
-        return numOf(100).minus(numOf(100).dividedBy(numOf(1).plus(relativeStrength)));
+        Num value = numOf(100).minus(numOf(100).dividedBy(numOf(1).plus(relativeStrength)));
+        log.info("RSI indicator value: {} index {}", value, index);
+        return value;
     }
 }

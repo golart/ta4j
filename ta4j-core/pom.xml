@@ -7,10 +7,15 @@
         <version>0.12</version>
     </parent>
     <artifactId>ta4j-core-custom</artifactId>
-    <version>0.12.28</version>
+    <version>0.12.29</version>
 
     <name>Ta4j Core</name>
     <description>ta4j is a Java library providing a simple API for technical analysis.</description>
+
+    <properties>
+        <log4j.version>2.11.2</log4j.version>
+        <slf4j.version>1.7.26</slf4j.version>
+    </properties>
 
     <distributionManagement>
         <repository>
@@ -26,9 +31,30 @@
     <dependencies>
         <!-- Logging facade -->
         <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-jcl</artifactId>
+            <version>${log4j.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
 
         <dependency>

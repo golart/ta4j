@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout disableAnsi="true" pattern="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <Console name="Console-strategy-execute" target="SYSTEM_OUT">
+            <PatternLayout disableAnsi="true" pattern="%d{HH:mm:ss.SSS} - %msg%n"/>
+        </Console>
+
+        <RollingFile name="BOT-BACKTEST" fileName="logs/investy-bot-backtest.log"
+                     filePattern="logs/investy-bot-backtest.%d{yyyy-MM-dd}.log.gz">
+            <PatternLayout>
+                <pattern>%msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="2" modulate="true"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+
+        <Logger name="backtest-logger" level="INFO" additivity="false">
+            <AppenderRef ref="Console-strategy-execute"/>
+            <!--<AppenderRef ref="BOT-BACKTEST"/>-->
+        </Logger>
+        
+        <!--<Root level="TRACE">-->
+            <!--<AppenderRef ref="Console"/>-->
+        <!--</Root>-->
+        <Root level="INFO">
+            <AppenderRef ref="Console-strategy-execute"/>
+        </Root>
+    </Loggers>
+
+</configuration>

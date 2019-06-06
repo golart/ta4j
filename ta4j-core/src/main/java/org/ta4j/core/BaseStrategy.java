@@ -24,8 +24,13 @@
 package org.ta4j.core;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.ta4j.core.trading.rules.RuleReset;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -34,13 +39,16 @@ import org.slf4j.LoggerFactory;
 public class BaseStrategy implements Strategy {
 
     /** The logger */
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     /** The class name */
     protected final String className = getClass().getSimpleName();
 
     /** Name of the strategy */
     private String name;
+    
+    /** List of rule reset of the strategy */
+    private List<RuleReset> ruleResetList = new ArrayList<>();
     
     @Getter
     private TimeSeries timeSeries;
@@ -70,6 +78,11 @@ public class BaseStrategy implements Strategy {
     public BaseStrategy(Rule entryRule, Rule exitRule, TimeSeries timeSeries) {
         this(null, entryRule, exitRule, 0);
         this.timeSeries = timeSeries;
+    }
+    
+    public BaseStrategy(Rule entryRule, Rule exitRule, TimeSeries timeSeries, List<RuleReset> resetList) {
+        this(entryRule, exitRule, timeSeries);
+        this.ruleResetList = resetList;
     }
 
      /**
@@ -201,5 +214,10 @@ public class BaseStrategy implements Strategy {
      */
     protected void traceShouldExit(int index, boolean exit) {
         log.trace(">>> {}#shouldExit({}): {}", className, index, exit);
+    }
+
+    @Override
+    public List<RuleReset> getRuleListToReset() {
+        return ruleResetList;
     }
 }

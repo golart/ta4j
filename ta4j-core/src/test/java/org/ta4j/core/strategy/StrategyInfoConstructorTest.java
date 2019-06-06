@@ -6,7 +6,7 @@ import org.ta4j.core.CsvTradesLoader;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TimeSeries;
-import org.ta4j.core.constructor.StrategyConstructorImpl;
+import org.ta4j.core.constructor.StrategyConstructor;
 import org.ta4j.core.data.Period;
 import org.ta4j.core.data.strategy.StrategyPropertyWrapper;
 
@@ -16,11 +16,11 @@ import org.ta4j.core.data.strategy.StrategyPropertyWrapper;
  */
 public class StrategyInfoConstructorTest {
 
-    private StrategyConstructorImpl strategyConstructor;
+    private StrategyConstructor strategyConstructor;
 
     @Before
     public void setUp() {
-        strategyConstructor = new StrategyConstructorImpl();
+        strategyConstructor = new StrategyConstructor();
     }
 
     @Test
@@ -176,8 +176,8 @@ public class StrategyInfoConstructorTest {
                 timeSeries, new StrategyPropertyWrapper());
         Rule testBuyRule16 = strategy16.getEntryRule();
          Rule testSellRule16 = strategy16.getExitRule();
-        
-        
+
+
         String testBuyRuleExpression17 = "STOCH[14, 4] < 30";
         String testSellRuleExpression17 = "STOCH[14, 7] > 70";
         Strategy strategy17 = strategyConstructor.createStrategyByExpression(
@@ -186,8 +186,8 @@ public class StrategyInfoConstructorTest {
                 timeSeries, new StrategyPropertyWrapper());
         Rule testBuyRule17 = strategy17.getEntryRule();
         Rule testSellRule17 = strategy17.getExitRule();
-        
-        
+
+
         String testBuyRuleExpression18 = "STOCH[19, 4] < 30 && MACD[12, 26, 9] == true";
         String testSellRuleExpression18 = "STOCH[15, 7] > 70 && MACD[12, 26, 9] == true";
         Strategy strategy18 = strategyConstructor.createStrategyByExpression(
@@ -196,8 +196,8 @@ public class StrategyInfoConstructorTest {
                 timeSeries, new StrategyPropertyWrapper());
         Rule testBuyRule18 = strategy18.getEntryRule();
         Rule testSellRule18 = strategy18.getExitRule();
-        
-        
+
+
         String testBuyRuleExpression19 = "STOCH[19, 4] < 30 && MACD == true";
         String testSellRuleExpression19 = "STOCH[15, 7] > 70 && MACD == true";
         Strategy strategy19 = strategyConstructor.createStrategyByExpression(
@@ -207,14 +207,6 @@ public class StrategyInfoConstructorTest {
         Rule testBuyRule19 = strategy19.getEntryRule();
         Rule testSellRule19 = strategy19.getExitRule();
 
-        String testBuyRuleExpression21 = "CCI[20] < 20";
-        String testSellRuleExpression21 = "CCI[20] > 70";
-        Strategy strategy21 = strategyConstructor.createStrategyByExpression(
-                testBuyRuleExpression21,
-                testSellRuleExpression21,
-                timeSeries, new StrategyPropertyWrapper());
-        Rule testBuyRule21 = strategy21.getEntryRule();
-        Rule testSellRule21 = strategy21.getExitRule();
 
         String testBuyRuleExpression20 = "RSI[14] < 30 && MACD == true -> TRAILING_BUY == 2";
         String testSellRuleExpression20 = "STOCH[14] > 70 && MACD == true -> TRAILING_SELL == 2";
@@ -224,5 +216,15 @@ public class StrategyInfoConstructorTest {
                 timeSeries, new StrategyPropertyWrapper());
         Rule testBuyRule20 = strategy20.getEntryRule();
         Rule testSellRule20 = strategy20.getExitRule();
+
+
+        String testBuyRuleExpression21 = "CCI[20] < 20";
+        String testSellRuleExpression21 = "CCI[20] > 70";
+        Strategy strategy21 = strategyConstructor.createStrategyByExpression(
+                testBuyRuleExpression21,
+                testSellRuleExpression21,
+                timeSeries, new StrategyPropertyWrapper());
+        Rule testBuyRule21 = strategy21.getEntryRule();
+        Rule testSellRule21 = strategy21.getExitRule();
     }
 }

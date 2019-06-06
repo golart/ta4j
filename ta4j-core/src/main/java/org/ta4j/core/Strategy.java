@@ -23,6 +23,11 @@
  *******************************************************************************/
 package org.ta4j.core;
 
+import org.ta4j.core.trading.rules.RuleReset;
+import org.ta4j.core.utils.CollectionUtils;
+
+import java.util.List;
+
 /**
  * A trading strategy.
  * </p>
@@ -35,6 +40,12 @@ public interface Strategy {
      * @return the name of the strategy
      */
     String getName();
+
+
+    /**
+     * @return the list of rule resetting after end of position
+     */
+    List<RuleReset> getRuleListToReset();
 
     /**
      * @return the entry rule
@@ -59,16 +70,16 @@ public interface Strategy {
     Strategy or(Strategy strategy);
 
     /**
-     * @param name the name of the strategy
-     * @param strategy the other strategy
+     * @param name           the name of the strategy
+     * @param strategy       the other strategy
      * @param unstablePeriod number of bars that will be strip off for this strategy
      * @return the AND combination of two {@link Strategy strategies}
      */
     Strategy and(String name, Strategy strategy, int unstablePeriod);
 
     /**
-     * @param name the name of the strategy
-     * @param strategy the other strategy
+     * @param name           the name of the strategy
+     * @param strategy       the other strategy
      * @param unstablePeriod number of bars that will be strip off for this strategy
      * @return the OR combination of two {@link Strategy strategies}
      */
@@ -96,7 +107,7 @@ public interface Strategy {
     boolean isUnstableAt(int index);
 
     /**
-     * @param index the bar index
+     * @param index         the bar index
      * @param tradingRecord the potentially needed trading history
      * @return true to recommend an order, false otherwise (no recommendation)
      */
@@ -105,9 +116,22 @@ public interface Strategy {
         if (trade.isNew()) {
             return shouldEnter(index, tradingRecord);
         } else if (trade.isOpened()) {
-            return shouldExit(index, tradingRecord);
+            boolean value =  shouldExit(index, tradingRecord);
+            if (value) {
+                resetRules();
+            }
+            return value;
         }
         return false;
+    }
+
+    /**
+     * Сброс настроек для правил
+     */
+    default void resetRules() {
+        if (!CollectionUtils.isEmpty(getRuleListToReset())) {
+            getRuleListToReset().forEach(RuleReset::reset);
+        }
     }
 
     /**
@@ -119,7 +143,7 @@ public interface Strategy {
     }
 
     /**
-     * @param index the bar index
+     * @param index         the bar index
      * @param tradingRecord the potentially needed trading history
      * @return true to recommend to enter, false otherwise
      */
@@ -136,7 +160,7 @@ public interface Strategy {
     }
 
     /**
-     * @param index the bar index
+     * @param index         the bar index
      * @param tradingRecord the potentially needed trading history
      * @return true to recommend to exit, false otherwise
      */

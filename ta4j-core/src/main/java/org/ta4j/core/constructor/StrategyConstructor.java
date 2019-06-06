@@ -2,6 +2,7 @@ package org.ta4j.core.constructor;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.BaseStrategy;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Strategy;
@@ -12,14 +13,17 @@ import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.withRule.IndicatorResolverImpl;
 import org.ta4j.core.num.PrecisionNum;
 import org.ta4j.core.trading.rules.CustomStopLossRule;
+import org.ta4j.core.trading.rules.RuleReset;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * @author VKozlov
  */
-public class StrategyConstructorImpl implements IStrategyConstructor {
+@Slf4j
+public class StrategyConstructor implements IStrategyConstructor {
 
     @Setter
     @Getter
@@ -30,10 +34,12 @@ public class StrategyConstructorImpl implements IStrategyConstructor {
     @Setter
     @Getter
     private StrategyPropertyWrapper strategyProperty;
+    private List<RuleReset> listToReset;
 
-    public StrategyConstructorImpl() {
+    public StrategyConstructor() {
         this.indicatorResolver = new IndicatorResolverImpl();
         this.expressionParser = new StrategyConstructorExpressionParser();
+        this.listToReset = new ArrayList<>();
     }
 
     @Override
@@ -45,7 +51,8 @@ public class StrategyConstructorImpl implements IStrategyConstructor {
         return new BaseStrategy(
                 createRuleToBuy(ruleToBuyExpression, series),
                 createRuleToSell(ruleToSellExpression, series),
-                series);
+                series,
+                listToReset);
     }
 
     @Override
@@ -55,7 +62,21 @@ public class StrategyConstructorImpl implements IStrategyConstructor {
 
     @Override
     public Rule createRuleToSell(String ruleToSellExpression, TimeSeries series) {
-        return createStopLossRule(createRule(ruleToSellExpression, new StrategyConstructorExitRuleBuilder(indicatorResolver, series, strategyProperty)), series);
+        StrategyConstructorExitRuleBuilder constructorExitRuleBuilder =
+                new StrategyConstructorExitRuleBuilder(indicatorResolver, series, strategyProperty);
+
+        CustomStopLossRule stopLossRule = null;
+        if (strategyProperty.getStopLoss() != null) {
+            stopLossRule = new CustomStopLossRule(new ClosePriceIndicator(series), PrecisionNum.valueOf(strategyProperty.getStopLoss()), series);
+            CustomStopLossRule finalStopLossRule = stopLossRule;
+            constructorExitRuleBuilder.withDisabledEvent(() -> {
+                finalStopLossRule.setDisabled(true);
+            });
+            listToReset.add(stopLossRule);
+        }
+        Rule sellRule = createRule(ruleToSellExpression, constructorExitRuleBuilder);
+
+        return createStopLossRule(sellRule, stopLossRule);
     }
 
     private Rule createRule(String ruleExpression,
@@ -64,11 +85,7 @@ public class StrategyConstructorImpl implements IStrategyConstructor {
         return ruleBuilder.createRule(buyExpressionParts);
     }
 
-    private Rule createStopLossRule(Rule baseRule, TimeSeries series) {
-        Rule sellRule = null;
-        if (strategyProperty.getStopLoss() != null) {
-            sellRule = new CustomStopLossRule(new ClosePriceIndicator(series), PrecisionNum.valueOf(strategyProperty.getStopLoss()), series);
-        }
-        return sellRule != null ? baseRule != null ? sellRule.or(baseRule) : sellRule : baseRule;
+    private Rule createStopLossRule(Rule baseRule, Rule stopLossRule) {
+        return stopLossRule != null ? baseRule != null ? stopLossRule.or(baseRule) : stopLossRule : baseRule;
     }
 }

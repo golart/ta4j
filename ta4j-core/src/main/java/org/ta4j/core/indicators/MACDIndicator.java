@@ -23,6 +23,7 @@
  *******************************************************************************/
 package org.ta4j.core.indicators;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Indicator;
 import org.ta4j.core.num.Num;
 
@@ -33,6 +34,7 @@ import org.ta4j.core.num.Num;
  * see
  * http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:moving_average_convergence_divergence_macd
  */
+@Slf4j
 public class MACDIndicator extends CachedIndicator<Num> {
 
     private static final long serialVersionUID = -6899062131135971403L;
@@ -67,6 +69,8 @@ public class MACDIndicator extends CachedIndicator<Num> {
 
     @Override
     protected Num calculate(int index) {
-        return shortTermEma.getValue(index).minus(longTermEma.getValue(index));
+        Num value = shortTermEma.getValue(index).minus(longTermEma.getValue(index));
+        log.info("MACD indicator value: {} index {}", value, index);
+        return value;
     }
 }

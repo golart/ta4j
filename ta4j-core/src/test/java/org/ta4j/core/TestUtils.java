@@ -40,7 +40,7 @@ public class TestUtils {
     /** Offset for double equality checking */
     public static final double GENERAL_OFFSET = 0.0001;
 
-    private static Logger log = LoggerFactory.getLogger(TestUtils.class);
+    private static Logger log = org.slf4j.LoggerFactory.getLogger(TestUtils.class);
 
     /**
      * Verifies that the actual {@code Num} value is equal to the given {@code String} representation.

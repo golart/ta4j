@@ -24,7 +24,6 @@
 package org.ta4j.core.trading.rules;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.ta4j.core.Rule;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
@@ -38,7 +37,7 @@ public abstract class AbstractRule implements Rule {
     /**
      * The logger
      */
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     /**
      * The class name
@@ -59,7 +58,7 @@ public abstract class AbstractRule implements Rule {
         if (tradingRecord == null) {
             return;
         }
-        
+
         Trade currentTrade = tradingRecord.getCurrentTrade();
         if (currentTrade != null) {
             if (tradingRecord.getLastOrder() == null || tradingRecord.getLastOrder().isSell()) {
@@ -74,7 +73,7 @@ public abstract class AbstractRule implements Rule {
                     prevEvent = tradingRecord.getCurrentTrade().getEventTypeSell() + " -> ";
                 }
                 tradingRecord.getCurrentTrade().setEventTypeSell(prevEvent + eventType);
-                
+
             }
         }
     }

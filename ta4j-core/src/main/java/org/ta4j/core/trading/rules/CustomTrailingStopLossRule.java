@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Bar;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
+import org.ta4j.core.data.event.DisabledRuleEvent;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.PrecisionNum;
@@ -51,6 +52,11 @@ public class CustomTrailingStopLossRule extends AbstractRule {
      */
     private Num takeProfitPercentage;
 
+    /**
+     * Событие отмены индикатора если текущее событие выполняется
+     */
+    private DisabledRuleEvent disabledStopLossRuleEvent;
+
     public CustomTrailingStopLossRule(ClosePriceIndicator closePrice, Num lossPercentage) {
         this.closePrice = closePrice;
         this.lossPercentage = lossPercentage;
@@ -58,7 +64,7 @@ public class CustomTrailingStopLossRule extends AbstractRule {
 
     public CustomTrailingStopLossRule(ClosePriceIndicator closePrice, Num lossPercentage, BigDecimal takeProfitPercentage) {
         this(closePrice, lossPercentage);
-        this.takeProfitPercentage = takeProfitPercentage != null ? PrecisionNum.valueOf(takeProfitPercentage) : PrecisionNum.valueOf(0);
+        this.takeProfitPercentage = takeProfitPercentage != null ? PrecisionNum.valueOf(takeProfitPercentage) : null;
     }
 
     public CustomTrailingStopLossRule withThresholdPrice(Num threshold) {
@@ -71,9 +77,20 @@ public class CustomTrailingStopLossRule extends AbstractRule {
         return this;
     }
 
+    public CustomTrailingStopLossRule withDisabledEvent(DisabledRuleEvent disabledEvent) {
+        this.disabledStopLossRuleEvent = disabledEvent;
+        return this;
+    }
+
     @Override
     public boolean isSatisfied(int index, TradingRecord tradingRecord) {
+        if (disabledStopLossRuleEvent != null) {
+            disabledStopLossRuleEvent.disabled();
+        }
+
         boolean satisfied = false;
+        Bar bar = closePrice.getTimeSeries().getBar(index);
+        Num currentPrice = closePrice.getValue(index);
         // No trading history or no trade opened, no loss
         if (tradingRecord != null) {
             Trade currentTrade = tradingRecord.getCurrentTrade();
@@ -85,7 +102,6 @@ public class CustomTrailingStopLossRule extends AbstractRule {
                     threshold = null;
                     takeProfitThresholdisSatisfied = false;
                 }
-                Num currentPrice = closePrice.getValue(index);
                 if (currentTrade.getEntry().isBuy()) {
                     satisfied = isBuySatisfied(currentPrice, currentTrade.getEntry().getPrice());
                 } else {
@@ -93,7 +109,6 @@ public class CustomTrailingStopLossRule extends AbstractRule {
                 }
 
                 if (satisfied) {
-                    Bar bar = closePrice.getTimeSeries().getBar(index);
                     setEventType(tradingRecord, String.format("satisfied by trailing " +
                                     "start time: %s " +
                                     "end time: %s " +
@@ -107,10 +122,15 @@ public class CustomTrailingStopLossRule extends AbstractRule {
                             threshold));
                 }
             } else if (currentTrade.isNew()) {
-                Num currentPrice = closePrice.getValue(index);
+                if (!currentTrade.equals(supervisedTrade)) {
+                    supervisedTrade = currentTrade;
+                    currentExtremum = null;
+                    takeProfitThreshold = null;
+                    threshold = null;
+                    takeProfitThresholdisSatisfied = false;
+                }
                 satisfied = isSellSatisfied(currentPrice);
                 if (satisfied) {
-                    Bar bar = closePrice.getTimeSeries().getBar(index);
                     setEventType(tradingRecord, String.format("satisfied by trailing " +
                                     "start time: %s " +
                                     "end time: %s " +
@@ -123,6 +143,17 @@ public class CustomTrailingStopLossRule extends AbstractRule {
                 }
             }
         }
+        log.info("TrailingStopLossRule satisfied: {} start time: {},  end time: {}, current price: {}," +
+                        " threshold: {}, takeProfitThreshold: {}, takeProfitThresholdisSatisfied: {}, currentExtremum: {}, index {} ",
+                satisfied,
+                bar.getBeginTime(),
+                bar.getEndTime(),
+                currentPrice,
+                threshold,
+                takeProfitThreshold,
+                takeProfitThresholdisSatisfied,
+                currentExtremum,
+                index);
         traceIsSatisfied(index, satisfied);
         return satisfied;
     }
@@ -133,16 +164,16 @@ public class CustomTrailingStopLossRule extends AbstractRule {
 
     private boolean isBuySatisfied(Num currentPrice, Num buyPrice) {
         boolean satisfied = false;
+        boolean trade = true;
+
         if (currentExtremum == null) {
             currentExtremum = currentPrice.numOf(Float.MIN_VALUE);
         }
         if (takeProfitThreshold == null && takeProfitPercentage != null && !takeProfitPercentage.isNaN()) {
             takeProfitThreshold = CustomTakeProfitRule.calculateProfitThresholdPrice(buyPrice, takeProfitPercentage);
+            trade = currentPrice.isGreaterThanOrEqual(takeProfitThreshold);
         }
-        if (takeProfitThreshold != null) {
-            takeProfitThresholdisSatisfied = currentPrice.isGreaterThanOrEqual(takeProfitThreshold);
-        }
-        if (currentPrice.isGreaterThan(currentExtremum) && takeProfitThreshold != null && takeProfitThresholdisSatisfied) {
+        if (currentPrice.isGreaterThan(currentExtremum) && trade) {
             currentExtremum = currentPrice;
             Num lossRatioThreshold = currentPrice.numOf(100).minus(lossPercentage).dividedBy(currentPrice.numOf(100));
             threshold = currentExtremum.multipliedBy(lossRatioThreshold);

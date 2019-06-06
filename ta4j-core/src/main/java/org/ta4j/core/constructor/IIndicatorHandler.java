@@ -15,7 +15,7 @@ public interface IIndicatorHandler {
     TradeResultWrapper execute(final IndicatorRequestWrapper requestWrapper);
 
     default String getParam(int index, List<String> params) {
-        if (CollectionUtils.isEmpty(params)) {
+        if (CollectionUtils.isEmpty(params) || index >= params.size()) {
             return null;
         }
         return params.get(index);

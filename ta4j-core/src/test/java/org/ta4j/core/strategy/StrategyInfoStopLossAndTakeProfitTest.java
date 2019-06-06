@@ -3,7 +3,7 @@ package org.ta4j.core.strategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.ta4j.core.*;
-import org.ta4j.core.constructor.StrategyConstructorImpl;
+import org.ta4j.core.constructor.StrategyConstructor;
 import org.ta4j.core.data.Period;
 import org.ta4j.core.data.strategy.StrategyPropertyWrapper;
 import org.ta4j.core.num.Num;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertFalse;
  */
 public class StrategyInfoStopLossAndTakeProfitTest  {
 
-    private StrategyConstructorImpl strategyConstructor;
+    private StrategyConstructor strategyConstructor;
 
     private TimeSeries timeSeries;
     private Period period;
@@ -33,7 +33,7 @@ public class StrategyInfoStopLossAndTakeProfitTest  {
     @Before
     public void setUp() {
         period = Period.PERIOD_1HRS;
-        strategyConstructor = new StrategyConstructorImpl();
+        strategyConstructor = new StrategyConstructor();
     }
 
     @Test

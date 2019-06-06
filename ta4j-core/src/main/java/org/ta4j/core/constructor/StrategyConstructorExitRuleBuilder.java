@@ -5,6 +5,7 @@ import org.ta4j.core.TimeSeries;
 import org.ta4j.core.data.ExpressionSymbol;
 import org.ta4j.core.data.Indicator;
 import org.ta4j.core.data.IndicatorRequestWrapper;
+import org.ta4j.core.data.event.DisabledRuleEvent;
 import org.ta4j.core.data.strategy.StrategyPropertyWrapper;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.PrecisionNum;
@@ -18,6 +19,10 @@ import java.util.List;
  * @author VKozlov
  */
 public class StrategyConstructorExitRuleBuilder extends StrategyConstructorRuleBuilder {
+    /**
+     * Событие оключения индикатора
+     */
+    private DisabledRuleEvent disabledRuleEvent;
 
     public StrategyConstructorExitRuleBuilder(IIndicatorResolver indicatorResolver,
                                               TimeSeries series,
@@ -51,6 +56,11 @@ public class StrategyConstructorExitRuleBuilder extends StrategyConstructorRuleB
                 .getExitRule();
     }
 
+    public StrategyConstructorExitRuleBuilder withDisabledEvent(DisabledRuleEvent disabledEvent) {
+        this.disabledRuleEvent = disabledEvent;
+        return this;
+    }
+
     protected Rule createByTradePropertiesRule(Rule baseRule, StrategyPropertyWrapper strategyProperties) {
         Rule sellRule = null;
         if (strategyProperties.getTrailingSell() == null) {
@@ -64,7 +74,8 @@ public class StrategyConstructorExitRuleBuilder extends StrategyConstructorRuleB
         } else if (strategyProperties.getTrailingSell() != null) {
             sellRule = new CustomTrailingStopLossRule(new ClosePriceIndicator(series),
                     PrecisionNum.valueOf(strategyProperties.getTrailingSell()),
-                    strategyProperties.getTakeProfit());
+                    strategyProperties.getTakeProfit())
+                .withDisabledEvent(disabledRuleEvent);
         }
         return sellRule != null ? baseRule != null ? sellRule.or(baseRule) : sellRule : baseRule;
     }

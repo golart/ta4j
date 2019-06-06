@@ -38,6 +38,7 @@ public class CustomCrossedDownIndicatorRule extends AbstractRule {
                     (bar != null ? " start time: " + bar.getBeginTime() + "end time: " + bar.getEndTime() :""));
         }
 
+        log.info("Indicator {} for rule CustomCrossedDownIndicatorRule is satisfied {}", indicatorName, satisfied);
         traceIsSatisfied(index, satisfied);
         return satisfied;
     }

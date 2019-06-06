@@ -11,7 +11,7 @@ import org.ta4j.core.trading.rules.AbstractRule;
  * Второе правило не выполняется пока не выполнится первое.
  * После выполнения первого оно игнорируется и выполняется только 2ое
  */
-public class ChainRule extends AbstractRule {
+public class ChainRule extends AbstractRule implements RuleReset {
 
 	private Rule rule1;
 	private boolean rule1Satisfied = false;
@@ -57,5 +57,10 @@ public class ChainRule extends AbstractRule {
 
 	public void setRule2(Rule rule2) {
 		this.rule2 = rule2;
+	}
+
+	@Override
+	public void reset() {
+		rule1Satisfied = false;
 	}
 }

@@ -36,6 +36,7 @@ public class CustomCrossedUpIndicatorRule extends AbstractRule {
             setEventType(tradingRecord, "satisfied by crossed up indicator " + indicatorName +
                     (bar != null ? " start time: " + bar.getBeginTime() + "end time: " + bar.getEndTime() :""));
         }
+        log.info("Indicator {} for rule CustomCrossedUpIndicatorRule is satisfied {}", indicatorName, satisfied);
         traceIsSatisfied(index, satisfied);
         return satisfied;
     }

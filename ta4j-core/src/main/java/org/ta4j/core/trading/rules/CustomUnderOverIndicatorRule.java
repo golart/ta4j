@@ -43,6 +43,7 @@ public class CustomUnderOverIndicatorRule extends UnderIndicatorRule {
                     (bar != null ? " start time: " + bar.getBeginTime() + "end time: " + bar.getEndTime() :""));
         }
         traceIsSatisfied(index, satisfied);
+        log.info("Indicator {} for rule CustomUnderOverIndicatorRule is satisfied {}, index {}", indicatorName, satisfied, index);
         return satisfied;
     }
 }
