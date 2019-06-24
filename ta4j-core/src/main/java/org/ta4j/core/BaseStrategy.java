@@ -24,9 +24,8 @@
 package org.ta4j.core;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Setter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.ta4j.core.trading.rules.RuleReset;
 
 import java.util.ArrayList;
@@ -51,6 +50,7 @@ public class BaseStrategy implements Strategy {
     private List<RuleReset> ruleResetList = new ArrayList<>();
     
     @Getter
+    @Setter
     private TimeSeries timeSeries;
 
     /** The entry rule */

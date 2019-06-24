@@ -28,12 +28,15 @@ public class StrategyConstructor implements IStrategyConstructor {
     @Setter
     @Getter
     private final StrategyConstructorExpressionParser expressionParser;
+
     @Setter
     @Getter
     private final IIndicatorResolver indicatorResolver;
+
     @Setter
     @Getter
     private StrategyPropertyWrapper strategyProperty;
+
     private List<RuleReset> listToReset;
 
     public StrategyConstructor() {

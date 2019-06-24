@@ -199,6 +199,10 @@ public class TimeSeriesManager {
                 }
             }
         }
+
+        //clear
+        timeSeries = null;
+
         return tradingRecord;
     }
 
