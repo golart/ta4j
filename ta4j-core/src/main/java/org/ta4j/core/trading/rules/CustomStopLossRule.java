@@ -1,6 +1,5 @@
 package org.ta4j.core.trading.rules;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.ta4j.core.Bar;
 import org.ta4j.core.TimeSeries;
@@ -12,19 +11,13 @@ import org.ta4j.core.num.Num;
  * @author VKozlov
  */
 @Slf4j
-public class CustomStopLossRule extends org.ta4j.core.trading.rules.StopLossRule implements RuleReset {
+public class CustomStopLossRule extends org.ta4j.core.trading.rules.StopLossRule {
 
     private org.slf4j.Logger tradeLogger = org.slf4j.LoggerFactory.getLogger("backtest-logger");
 
     private ClosePriceIndicator closePrice;
     private TimeSeries series;
     private Num lossRatioThreshold;
-
-    /**
-     * Поле отключающее подсчет индикатора. Необходимо для отключения
-     */
-    @Setter
-    private boolean disabled = false;
 
     public CustomStopLossRule(ClosePriceIndicator closePrice, Num lossPercentage, final TimeSeries series) {
         super(closePrice, lossPercentage);
@@ -34,17 +27,7 @@ public class CustomStopLossRule extends org.ta4j.core.trading.rules.StopLossRule
     }
 
     @Override
-    public void reset() {
-        log.info("Stop loss rule enabled");
-        disabled = false;
-    }
-
-    @Override
     public boolean isSatisfied(int index, TradingRecord tradingRecord) {
-        if (disabled) {
-            log.info("Stop loss rule disabled");
-            return false;
-        }
         boolean satisfied = super.isSatisfied(index, tradingRecord);
 
         if (tradingRecord.getCurrentTrade().isOpened()) {

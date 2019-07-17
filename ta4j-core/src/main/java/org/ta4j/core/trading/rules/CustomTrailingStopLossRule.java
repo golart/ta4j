@@ -52,11 +52,6 @@ public class CustomTrailingStopLossRule extends AbstractRule {
      */
     private Num takeProfitPercentage;
 
-    /**
-     * Событие отмены индикатора если текущее событие выполняется
-     */
-    private DisabledRuleEvent disabledStopLossRuleEvent;
-
     public CustomTrailingStopLossRule(ClosePriceIndicator closePrice, Num lossPercentage) {
         this.closePrice = closePrice;
         this.lossPercentage = lossPercentage;
@@ -77,17 +72,8 @@ public class CustomTrailingStopLossRule extends AbstractRule {
         return this;
     }
 
-    public CustomTrailingStopLossRule withDisabledEvent(DisabledRuleEvent disabledEvent) {
-        this.disabledStopLossRuleEvent = disabledEvent;
-        return this;
-    }
-
     @Override
     public boolean isSatisfied(int index, TradingRecord tradingRecord) {
-        if (disabledStopLossRuleEvent != null) {
-            disabledStopLossRuleEvent.disabled();
-        }
-
         boolean satisfied = false;
         Bar bar = closePrice.getTimeSeries().getBar(index);
         Num currentPrice = closePrice.getValue(index);

@@ -71,11 +71,6 @@ public class StrategyConstructor implements IStrategyConstructor {
         CustomStopLossRule stopLossRule = null;
         if (strategyProperty.getStopLoss() != null) {
             stopLossRule = new CustomStopLossRule(new ClosePriceIndicator(series), PrecisionNum.valueOf(strategyProperty.getStopLoss()), series);
-            CustomStopLossRule finalStopLossRule = stopLossRule;
-            constructorExitRuleBuilder.withDisabledEvent(() -> {
-                finalStopLossRule.setDisabled(true);
-            });
-            listToReset.add(stopLossRule);
         }
         Rule sellRule = createRule(ruleToSellExpression, constructorExitRuleBuilder);
 

@@ -255,7 +255,7 @@ public abstract class StrategyConstructorRuleBuilder {
         for (StopLossOrTrailingIndicatorWrapper wrapper : lossOrTrailingIndicatorWrappers) {
             switch (wrapper.getIndicator()) {
                 case STOP_LOSS:
-//                    strategyProperties.setStopLoss(Integer.valueOf(wrapper.getIndicatorLogicalValue()));
+                    strategyProperties.setStopLoss(new BigDecimal(wrapper.getIndicatorLogicalValue()));
                     break;
                 case TAKE_PROFIT:
                     strategyProperties.setTakeProfit(new BigDecimal(wrapper.getIndicatorLogicalValue()));
